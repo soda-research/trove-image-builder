@@ -200,7 +200,7 @@ _build_image() {
   export DISTRO_RELEASE=${DISTRO_RELEASE:-'xenial'}
   export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
 
-  PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder'}
+  PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder/diskimage_builder'}
   PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
 
   export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
