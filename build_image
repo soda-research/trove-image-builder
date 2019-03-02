@@ -263,9 +263,7 @@ _build_image() {
       "${QEMU_IMG_OPTIONS[@]}" \
       ${DISTRO} vm \
       cloud-init-datasources \
-      ${DISTRO}-guest \
       ${DISTRO}-${DISTRO_RELEASE}-guest \
-      ${DISTRO}-${SERVICE_TYPE} \
       ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE} |&tee ${LOG_DIR}
   fi
 }
