@@ -198,7 +198,7 @@ _build_image() {
   export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
   export DISTRO=${DISTRO:-'ubuntu'}
   export DISTRO_RELEASE=${DISTRO_RELEASE:-'xenial'}
-  export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-'/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}'}
+  export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
 
   PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder'}
   PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
@@ -234,6 +234,18 @@ _build_image() {
   echo "EXTRA_ELEMENTS=${EXTRA_ELEMENTS}"
   echo "============================================="
 
+  echo
+  echo "disk-image-create \\"
+  echo "  -a amd64 \\"
+  echo "  -o ${IMAGE_OUTPUT_DIR} \\"
+  echo "  -x \\"
+  echo "  ${QEMU_IMG_OPTIONS} \\"
+  echo "  ${DISTRO}-${DISTRO_RELEASE} ${EXTRA_ELEMENTS} vm \\"
+  echo "  cloud-init-datasources \\"
+  echo "  ${DISTRO}-${DISTRO_RELEASE}-guest \\"
+  echo "  ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}"
+  echo
+
   read -p "Ready to build? " -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]
@@ -241,7 +253,8 @@ _build_image() {
     disk-image-create \
       -a amd64 \
       -o "${IMAGE_OUTPUT_DIR}" \
-      -x ${QEMU_IMG_OPTIONS} \
+      -x \
+      ${QEMU_IMG_OPTIONS} \
       ${DISTRO}-${DISTRO_RELEASE} ${EXTRA_ELEMENTS} vm \
       cloud-init-datasources \
       ${DISTRO}-${DISTRO_RELEASE}-guest \
