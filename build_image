@@ -189,8 +189,8 @@ done
 _build_image() {
   local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f7)
 
-  export HOST_USERNAME=${HOST_USERNAME:-'stack'}
-  export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'stack'}
+  export HOST_USERNAME=${HOST_USERNAME:-'root'}
+  export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'root'}
   export GUEST_USERNAME=${GUEST_USERNAME:-'trove'}
   export CONTROLLER_IP=${CONTROLLER_IP:-$primary_ip}
   export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-'/opt/stack/trove/integration/scripts'}
