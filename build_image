@@ -154,7 +154,7 @@ do
       ;;
     --distro-release)
       _require_argument "${__option}" "${__maybe_param}"
-      DISTRO_RELEASE="${__maybe_param}"
+      RELEASE="${__maybe_param}"
       shift
       ;;
     --controller-ip)
@@ -196,12 +196,11 @@ _build_image() {
   export GUEST_LOGDIR=${GUEST_LOGDIR:-'/var/log/trove/'}
   export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
   export DISTRO=${DISTRO:-'ubuntu'}
-  export DISTRO_RELEASE=${DISTRO_RELEASE:-'xenial'}
+  export RELEASE=${RELEASE:-'xenial'}
   export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
   export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
-  export DIB_APT_CONF_DIR=/etc/apt/apt.conf.d
   export DIB_CLOUD_INIT_ETC_HOSTS=true
-  export DIB_RELEASE=$DISTRO_RELEASE
+  export DIB_RELEASE=$RELEASE
   export QEMU_IMG_OPTIONS=(--qemu-img-options compat=1.1)
 
   PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder/diskimage_builder'}
@@ -211,7 +210,7 @@ _build_image() {
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
 
-  LOG_DIR="/var/log/dib-${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}.log"
+  LOG_DIR="/var/log/dib-${DISTRO}-${RELEASE}-${SERVICE_TYPE}.log"
 
   echo "============================================="
   echo "BUILD PARAMS"
@@ -229,7 +228,7 @@ _build_image() {
   echo "ESCAPED_GUEST_LOGDIR=${ESCAPED_GUEST_LOGDIR}"
   echo "DIB_CLOUD_INIT_DATASOURCES=${DIB_CLOUD_INIT_DATASOURCES}"
   echo "DISTRO=${DISTRO}"
-  echo "DIB_RELEASE=${DISTRO_RELEASE}"
+  echo "DIB_RELEASE=${RELEASE}"
   echo "IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR}"
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS[@]}"
@@ -246,9 +245,9 @@ _build_image() {
   echo "  ${DISTRO} vm \\"
   echo "  cloud-init-datasources \\"
   echo "  ${DISTRO}-guest \\"
-  echo "  ${DISTRO}-${DISTRO_RELEASE}-guest \\"
+  echo "  ${DISTRO}-${RELEASE}-guest \\"
   echo "  ${DISTRO}-${SERVICE_TYPE} \\"
-  echo "  ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}"
+  echo "  ${DISTRO}-${RELEASE}-${SERVICE_TYPE}"
   echo
 
   read -p "Ready to build? " -n 1 -r
@@ -263,8 +262,8 @@ _build_image() {
       "${QEMU_IMG_OPTIONS[@]}" \
       ${DISTRO} vm \
       cloud-init-datasources \
-      ${DISTRO}-${DISTRO_RELEASE}-guest \
-      ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE} |&tee ${LOG_DIR}
+      ${DISTRO}-${RELEASE}-guest \
+      ${DISTRO}-${RELEASE}-${SERVICE_TYPE} |&tee ${LOG_DIR}
   fi
 }
 
