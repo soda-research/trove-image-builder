@@ -206,7 +206,6 @@ _build_image() {
   export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
-  export EXTRA_ELEMENTS=${EXTRA_ELEMENTS:-''}
   export DIB_CLOUD_INIT_ETC_HOSTS=true
   export QEMU_IMG_OPTIONS="--qemu-img-options compat=1.1"
 
@@ -231,18 +230,20 @@ _build_image() {
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS}"
   echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
-  echo "EXTRA_ELEMENTS=${EXTRA_ELEMENTS}"
   echo "============================================="
 
   echo
   echo "disk-image-create \\"
   echo "  -a amd64 \\"
+  echo "  -t qcow2 \\"
   echo "  -o ${IMAGE_OUTPUT_DIR} \\"
   echo "  -x \\"
   echo "  ${QEMU_IMG_OPTIONS} \\"
-  echo "  ${DISTRO}-${DISTRO_RELEASE} ${EXTRA_ELEMENTS} vm \\"
+  echo "  ${DISTRO} vm \\"
   echo "  cloud-init-datasources \\"
+  echo "  ${DISTRO}-guest \\"
   echo "  ${DISTRO}-${DISTRO_RELEASE}-guest \\"
+  echo "  ${DISTRO}-${SERVICE_TYPE} \\"
   echo "  ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}"
   echo
 
@@ -252,12 +253,15 @@ _build_image() {
   then
     disk-image-create \
       -a amd64 \
-      -o "${IMAGE_OUTPUT_DIR}" \
+      -t qcow2 \
+      -o ${IMAGE_OUTPUT_DIR} \
       -x \
       ${QEMU_IMG_OPTIONS} \
-      ${DISTRO}-${DISTRO_RELEASE} ${EXTRA_ELEMENTS} vm \
+      ${DISTRO} vm \
       cloud-init-datasources \
+      ${DISTRO}-guest \
       ${DISTRO}-${DISTRO_RELEASE}-guest \
+      ${DISTRO}-${SERVICE_TYPE} \
       ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}
   fi
 }
