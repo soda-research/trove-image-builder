@@ -195,10 +195,14 @@ _build_image() {
   export SSH_DIR=${SSH_DIR:-'/root/.ssh'}
   export GUEST_LOGDIR=${GUEST_LOGDIR:-'/var/log/trove/'}
   export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
-  export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
   export DISTRO=${DISTRO:-'ubuntu'}
   export DISTRO_RELEASE=${DISTRO_RELEASE:-'xenial'}
   export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
+  export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
+  export DIB_APT_CONF_DIR=/etc/apt/apt.conf.d
+  export DIB_CLOUD_INIT_ETC_HOSTS=true
+  export DIB_RELEASE=$DISTRO_RELEASE
+  export QEMU_IMG_OPTIONS=(--qemu-img-options compat=1.1)
 
   PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder/diskimage_builder'}
   PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
@@ -206,8 +210,8 @@ _build_image() {
   export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
-  export DIB_CLOUD_INIT_ETC_HOSTS=true
-  export QEMU_IMG_OPTIONS=(--qemu-img-options compat=1.1)
+
+  LOG_DIR="/var/log/dib-${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}.log"
 
   echo "============================================="
   echo "BUILD PARAMS"
@@ -225,7 +229,7 @@ _build_image() {
   echo "ESCAPED_GUEST_LOGDIR=${ESCAPED_GUEST_LOGDIR}"
   echo "DIB_CLOUD_INIT_DATASOURCES=${DIB_CLOUD_INIT_DATASOURCES}"
   echo "DISTRO=${DISTRO}"
-  echo "DISTRO_RELEASE=${DISTRO_RELEASE}"
+  echo "DIB_RELEASE=${DISTRO_RELEASE}"
   echo "IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR}"
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS[@]}"
@@ -262,7 +266,7 @@ _build_image() {
       ${DISTRO}-guest \
       ${DISTRO}-${DISTRO_RELEASE}-guest \
       ${DISTRO}-${SERVICE_TYPE} \
-      ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}
+      ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE} |&tee ${LOG_DIR}
   fi
 }
 
