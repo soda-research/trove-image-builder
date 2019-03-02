@@ -119,9 +119,6 @@ _PRINT_HELP=0
 _USE_DEBUG=0
 
 # Initialize additional expected option variables.
-_OPTION_X=0
-_SHORT_OPTION_WITH_PARAMETER=""
-_LONG_OPTION_WITH_PARAMETER=""
 
 _require_argument() {
   local _option="${1:-}"
@@ -145,17 +142,29 @@ do
     --debug)
       _USE_DEBUG=1
       ;;
-    -x|--option-x)
-      _OPTION_X=1
-      ;;
-    -o)
+    --datastore)
       _require_argument "${__option}" "${__maybe_param}"
-      _SHORT_OPTION_WITH_PARAMETER="${__maybe_param}"
-       shift
+      SERVICE_TYPE="${__maybe_param}"
+      shift
       ;;
-    --long-option-with-argument)
+    --distro)
       _require_argument "${__option}" "${__maybe_param}"
-      _LONG_OPTION_WITH_PARAMETER="${__maybe_param}"
+      DISTRO="${__maybe_param}"
+      shift
+      ;;
+    --distro-release)
+      _require_argument "${__option}" "${__maybe_param}"
+      DISTRO_RELEASE="${__maybe_param}"
+      shift
+      ;;
+    --controller-ip)
+      _require_argument "${__option}" "${__maybe_param}"
+      CONTROLLER_IP="${__maybe_param}"
+      shift
+      ;;
+    --output)
+      _require_argument "${__option}" "${__maybe_param}"
+      IMAGE_OUTPUT_DIR="${__maybe_param}"
       shift
       ;;
     --endopts)
@@ -173,14 +182,14 @@ done
 ###############################################################################
 
 _build_image() {
-  local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
+  local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f7)
 
   export HOST_USERNAME=${HOST_USERNAME:-'root'}
   export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'root'}
   export GUEST_USERNAME=${GUEST_USERNAME:-'trove'}
   export CONTROLLER_IP=${CONTROLLER_IP:-$primary_ip}
   export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-'/opt/stack/trove/integration/scripts'}
-  export SERVICE_TYPE=${SERVICE_TYPE:-'mysql'}
+  export SERVICE_TYPE=${SERVICE_TYPE:-'mariadb'}
   export PATH_TROVE=${PATH_TROVE:-'/opt/stack/trove'}
   export ESCAPED_PATH_TROVE=$(echo $PATH_TROVE | sed 's/\//\\\//g')
   export SSH_DIR=${SSH_DIR:-'/root/.ssh'}
@@ -188,6 +197,7 @@ _build_image() {
   export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
   export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
   export DISTRO=${DISTRO:-'ubuntu'}
+  export DISTRO_RELEASE=${DISTRO_RELEASE:-'xenial'}
   export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-'/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}'}
 
   PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder'}
@@ -215,6 +225,7 @@ _build_image() {
   echo "ESCAPED_GUEST_LOGDIR=${ESCAPED_GUEST_LOGDIR}"
   echo "DIB_CLOUD_INIT_DATASOURCES=${DIB_CLOUD_INIT_DATASOURCES}"
   echo "DISTRO=${DISTRO}"
+  echo "DISTRO_RELEASE=${DISTRO_RELEASE}"
   echo "IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR}"
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS}"
@@ -229,8 +240,10 @@ _build_image() {
       -a amd64 \
       -o "${IMAGE_OUTPUT_DIR}" \
       -x ${QEMU_IMG_OPTIONS} \
-      ${DISTRO} ${EXTRA_ELEMENTS} vm \
-      cloud-init-datasources ${DISTRO}-guest ${DISTRO}-${SERVICE_TYPE}
+      ${DISTRO}-${DISTRO_RELEASE} ${EXTRA_ELEMENTS} vm \
+      cloud-init-datasources \
+      ${DISTRO}-${DISTRO_RELEASE}-guest \
+      ${DISTRO}-${DISTRO_RELEASE}-${SERVICE_TYPE}
   fi
 }
 
