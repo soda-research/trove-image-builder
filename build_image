@@ -173,7 +173,65 @@ done
 ###############################################################################
 
 _build_image() {
-  echo "ok"
+  local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
+
+  export HOST_USERNAME=${HOST_USERNAME:-'root'}
+  export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'root'}
+  export GUEST_USERNAME=${GUEST_USERNAME:-'trove'}
+  export CONTROLLER_IP=${CONTROLLER_IP:-$primary_ip}
+  export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-'/opt/stack/trove/integration/scripts'}
+  export SERVICE_TYPE=${SERVICE_TYPE:-'mysql'}
+  export PATH_TROVE=${PATH_TROVE:-'/opt/stack/trove'}
+  export ESCAPED_PATH_TROVE=$(echo $PATH_TROVE | sed 's/\//\\\//g')
+  export SSH_DIR=${SSH_DIR:-'/root/.ssh'}
+  export GUEST_LOGDIR=${GUEST_LOGDIR:-'/var/log/trove/'}
+  export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
+  export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
+  export DISTRO=${DISTRO:-'ubuntu'}
+  export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-'/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}'}
+
+  PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder'}
+  PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
+
+  export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
+  export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
+  export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
+  export DIB_CLOUD_INIT_ETC_HOSTS=true
+  export QEMU_IMG_OPTIONS="--qemu-img-options compat=1.1"
+
+  echo "============================================="
+  echo "BUILD PARAMS"
+  echo "============================================="
+  echo "HOST_USERNAME=${HOST_USERNAME}"
+  echo "HOST_SCP_USERNAME=${HOST_SCP_USERNAME}"
+  echo "GUEST_USERNAME=${GUEST_USERNAME}"
+  echo "CONTROLLER_IP=${CONTROLLER_IP}"
+  echo "TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS}"
+  echo "SERVICE_TYPE=${SERVICE_TYPE}"
+  echo "PATH_TROVE=${PATH_TROVE}"
+  echo "ESCAPED_PATH_TROVE=${ESCAPED_PATH_TROVE}"
+  echo "SSH_DIR=${SSH_DIR}"
+  echo "GUEST_LOGDIR=${GUEST_LOGDIR}"
+  echo "ESCAPED_GUEST_LOGDIR=${ESCAPED_GUEST_LOGDIR}"
+  echo "DIB_CLOUD_INIT_DATASOURCES=${DIB_CLOUD_INIT_DATASOURCES}"
+  echo "DISTRO=${DISTRO}"
+  echo "IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR}"
+  echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
+  echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS}"
+  echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
+  echo "============================================="
+
+  read -p "Ready to build? " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    disk-image-create \
+      -a amd64 \
+      -o "${IMAGE_OUTPUT_DIR}" \
+      -x ${QEMU_IMG_OPTIONS} \
+      ${DISTRO} ${EXTRA_ELEMENTS} vm \
+      cloud-init-datasources ${DISTRO}-guest ${DISTRO}-${SERVICE_TYPE}
+  fi
 }
 
 
