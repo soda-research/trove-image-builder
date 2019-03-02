@@ -206,6 +206,7 @@ _build_image() {
   export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
+  export EXTRA_ELEMENTS=${EXTRA_ELEMENTS:-''}
   export DIB_CLOUD_INIT_ETC_HOSTS=true
   export QEMU_IMG_OPTIONS="--qemu-img-options compat=1.1"
 
@@ -230,6 +231,7 @@ _build_image() {
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS}"
   echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
+  echo "EXTRA_ELEMENTS=${EXTRA_ELEMENTS}"
   echo "============================================="
 
   read -p "Ready to build? " -n 1 -r
