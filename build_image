@@ -184,15 +184,15 @@ done
 _build_image() {
   local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f7)
 
-  export HOST_USERNAME=${HOST_USERNAME:-'root'}
-  export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'root'}
+  export HOST_USERNAME=${HOST_USERNAME:-'stack'}
+  export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'stack'}
   export GUEST_USERNAME=${GUEST_USERNAME:-'trove'}
   export CONTROLLER_IP=${CONTROLLER_IP:-$primary_ip}
   export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-'/opt/stack/trove/integration/scripts'}
   export SERVICE_TYPE=${SERVICE_TYPE:-'mariadb'}
   export PATH_TROVE=${PATH_TROVE:-'/opt/stack/trove'}
   export ESCAPED_PATH_TROVE=$(echo $PATH_TROVE | sed 's/\//\\\//g')
-  export SSH_DIR=${SSH_DIR:-'/root/.ssh'}
+  export SSH_DIR=${SSH_DIR:-'/opt/stack/.ssh'}
   export GUEST_LOGDIR=${GUEST_LOGDIR:-'/var/log/trove/'}
   export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
   export DISTRO=${DISTRO:-'ubuntu'}
