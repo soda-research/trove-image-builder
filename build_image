@@ -162,6 +162,11 @@ do
       CONTROLLER_IP="${__maybe_param}"
       shift
       ;;
+    --log-dir)
+      _require_argument "${__option}" "${__maybe_param}"
+      LOG_DIR="${__maybe_param}"
+      shift
+      ;;
     --output)
       _require_argument "${__option}" "${__maybe_param}"
       IMAGE_OUTPUT_DIR="${__maybe_param}"
@@ -210,7 +215,9 @@ _build_image() {
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
 
-  LOG_DIR="/var/log/dib-${DISTRO}-${RELEASE}-${SERVICE_TYPE}.log"
+  LOG_DIR=${LOG_DIR:-"/var/log/trove-image-builder"}
+  mkdir -p ${LOG_DIR}
+  LOG_PATH="${LOG_DIR}/dib-${DISTRO}-${RELEASE}-${SERVICE_TYPE}.log"
 
   echo "============================================="
   echo "BUILD PARAMS"
@@ -233,6 +240,7 @@ _build_image() {
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS[@]}"
   echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
+  echo "LOG_PATH=${LOG_PATH}"
   echo "============================================="
 
   echo
@@ -263,7 +271,7 @@ _build_image() {
       ${DISTRO} vm \
       cloud-init-datasources \
       ${DISTRO}-${RELEASE}-guest \
-      ${DISTRO}-${RELEASE}-${SERVICE_TYPE} |&tee ${LOG_DIR}
+      ${DISTRO}-${RELEASE}-${SERVICE_TYPE} |&tee ${LOG_PATH}
   fi
 }
 
