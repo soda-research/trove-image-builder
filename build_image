@@ -207,7 +207,7 @@ _build_image() {
   export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
   export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
   export DIB_CLOUD_INIT_ETC_HOSTS=true
-  export QEMU_IMG_OPTIONS="--qemu-img-options compat=1.1"
+  export QEMU_IMG_OPTIONS=(--qemu-img-options compat=1.1)
 
   echo "============================================="
   echo "BUILD PARAMS"
@@ -228,7 +228,7 @@ _build_image() {
   echo "DISTRO_RELEASE=${DISTRO_RELEASE}"
   echo "IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR}"
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
-  echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS}"
+  echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS[@]}"
   echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
   echo "============================================="
 
@@ -238,7 +238,7 @@ _build_image() {
   echo "  -t qcow2 \\"
   echo "  -o ${IMAGE_OUTPUT_DIR} \\"
   echo "  -x \\"
-  echo "  ${QEMU_IMG_OPTIONS} \\"
+  echo "  ${QEMU_IMG_OPTIONS[@]} \\"
   echo "  ${DISTRO} vm \\"
   echo "  cloud-init-datasources \\"
   echo "  ${DISTRO}-guest \\"
@@ -256,7 +256,7 @@ _build_image() {
       -t qcow2 \
       -o ${IMAGE_OUTPUT_DIR} \
       -x \
-      ${QEMU_IMG_OPTIONS} \
+      "${QEMU_IMG_OPTIONS[@]}" \
       ${DISTRO} vm \
       cloud-init-datasources \
       ${DISTRO}-guest \
