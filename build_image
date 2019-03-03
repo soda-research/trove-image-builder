@@ -16,6 +16,8 @@ IFS=$'\n\t'
 
 _ME=$(basename "${0}")
 
+_MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 ###############################################################################
 # Debug
 ###############################################################################
@@ -162,6 +164,11 @@ do
       CONTROLLER_IP="${__maybe_param}"
       shift
       ;;
+    --extra-elements)
+      _require_argument "${__option}" "${__maybe_param}"
+      EXTRA_ELEMENTS="${__maybe_param}"
+      shift
+      ;;
     --log-dir)
       _require_argument "${__option}" "${__maybe_param}"
       LOG_DIR="${__maybe_param}"
@@ -211,9 +218,10 @@ _build_image() {
   PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder/diskimage_builder'}
   PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
 
-  export ELEMENTS_PATH=$TROVESTACK_SCRIPTS/files/elements
-  export ELEMENTS_PATH+=:$PATH_DISKIMAGEBUILDER/elements
-  export ELEMENTS_PATH+=:$PATH_TRIPLEO_ELEMENTS/elements
+  export ELEMENTS_PATH="${TROVESTACK_SCRIPTS}/files/elements"
+  export ELEMENTS_PATH+=":${PATH_DISKIMAGEBUILDER}/elements"
+  export ELEMENTS_PATH+=":${PATH_TRIPLEO_ELEMENTS}/elements"
+  export EXTRA_ELEMENTS=${EXTRA_ELEMENTS:-''}
 
   LOG_DIR=${LOG_DIR:-"/var/log/trove-image-builder"}
   mkdir -p ${LOG_DIR}
@@ -240,6 +248,7 @@ _build_image() {
   echo "DIB_CLOUD_INIT_ETC_HOSTS=${DIB_CLOUD_INIT_ETC_HOSTS}"
   echo "QEMU_IMG_OPTIONS=${QEMU_IMG_OPTIONS[@]}"
   echo "ELEMENTS_PATH=${ELEMENTS_PATH}"
+  echo "EXTRA_ELEMENTS=${EXTRA_ELEMENTS}"
   echo "LOG_PATH=${LOG_PATH}"
   echo "============================================="
 
@@ -255,7 +264,8 @@ _build_image() {
   echo "  ${DISTRO}-guest \\"
   echo "  ${DISTRO}-${RELEASE}-guest \\"
   echo "  ${DISTRO}-${SERVICE_TYPE} \\"
-  echo "  ${DISTRO}-${RELEASE}-${SERVICE_TYPE}"
+  echo "  ${DISTRO}-${RELEASE}-${SERVICE_TYPE} \\"
+  echo "  ${EXTRA_ELEMENTS}"
   echo
 
   read -p "Ready to build? " -n 1 -r
@@ -271,7 +281,8 @@ _build_image() {
       ${DISTRO} vm \
       cloud-init-datasources \
       ${DISTRO}-${RELEASE}-guest \
-      ${DISTRO}-${RELEASE}-${SERVICE_TYPE} |&tee ${LOG_PATH}
+      ${DISTRO}-${RELEASE}-${SERVICE_TYPE} \
+      ${EXTRA_ELEMENTS} |&tee ${LOG_PATH}
   fi
 }
 
