@@ -144,6 +144,11 @@ do
     --debug)
       _USE_DEBUG=1
       ;;
+    --workspace)
+      _require_argument "${__option}" "${__maybe_param}"
+      WORKSPACE="${__maybe_param}"
+      shift
+      ;;
     --datastore)
       _require_argument "${__option}" "${__maybe_param}"
       SERVICE_TYPE="${__maybe_param}"
@@ -196,27 +201,29 @@ done
 _build_image() {
   local primary_ip=$(ip route get 8.8.8.8 | head -1 | cut -d' ' -f7)
 
+  WORKSPACE=${WORKSPACE:-'/opt/stack'}
+
   export HOST_USERNAME=${HOST_USERNAME:-'root'}
   export HOST_SCP_USERNAME=${HOST_SCP_USERNAME:-'root'}
   export GUEST_USERNAME=${GUEST_USERNAME:-'trove'}
   export CONTROLLER_IP=${CONTROLLER_IP:-$primary_ip}
-  export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-'/opt/stack/trove/integration/scripts'}
+  export TROVESTACK_SCRIPTS=${TROVESTACK_SCRIPTS:-"${WORKSPACE}/trove/integration/scripts"}
   export SERVICE_TYPE=${SERVICE_TYPE:-'mariadb'}
-  export PATH_TROVE=${PATH_TROVE:-'/opt/stack/trove'}
+  export PATH_TROVE=${PATH_TROVE:-"${WORKSPACE}/trove"}
   export ESCAPED_PATH_TROVE=$(echo $PATH_TROVE | sed 's/\//\\\//g')
-  export SSH_DIR=${SSH_DIR:-'/opt/stack/.ssh'}
+  export SSH_DIR=${SSH_DIR:-"${WORKSPACE}/.ssh"}
   export GUEST_LOGDIR=${GUEST_LOGDIR:-'/var/log/trove/'}
   export ESCAPED_GUEST_LOGDIR=$(echo $GUEST_LOGDIR | sed 's/\//\\\//g')
   export DISTRO=${DISTRO:-'ubuntu'}
   export RELEASE=${RELEASE:-'xenial'}
-  export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"/opt/stack/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
+  export IMAGE_OUTPUT_DIR=${IMAGE_OUTPUT_DIR:-"${WORKSPACE}/images/${DISTRO}_${SERVICE_TYPE}/${DISTRO}_${SERVICE_TYPE}"}
   export DIB_CLOUD_INIT_DATASOURCES="ConfigDrive"
   export DIB_CLOUD_INIT_ETC_HOSTS=true
   export DIB_RELEASE=$RELEASE
   export QEMU_IMG_OPTIONS=(--qemu-img-options compat=1.1)
 
-  PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-'/opt/stack/diskimage-builder/diskimage_builder'}
-  PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-'/opt/stack/tripleo-image-elements'}
+  PATH_DISKIMAGEBUILDER=${PATH_DISKIMAGEBUILDER:-"${WORKSPACE}/diskimage-builder/diskimage_builder"}
+  PATH_TRIPLEO_ELEMENTS=${PATH_TRIPLEO_ELEMENTS:-"${WORKSPACE}/tripleo-image-elements"}
 
   export ELEMENTS_PATH="${TROVESTACK_SCRIPTS}/files/elements"
   export ELEMENTS_PATH+=":${PATH_DISKIMAGEBUILDER}/elements"
