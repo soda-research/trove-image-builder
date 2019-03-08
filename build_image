@@ -65,7 +65,15 @@ Usage:
   ${_ME} -h | --help
 
 Options:
-  -h --help  Display this help information.
+  -h --help                           Display this help information
+  --debug                             Enable debug mode
+  --datastore <datastore>             Set datastore (default: mariadb)
+  --distro <distro>                   Set distribution of operating system (default: ubuntu)
+  --distro-release <distro-release>   Set release of operating system distribution (default: xenial)
+  --controller-ip <controller-ip>     Set IP of OpenStack controller from which Guest Agent sources will be synchonized
+  --output <output-dir>               Provide output directory for built images
+  --log-dir <log-dir>                 Specify logs directory
+  --extra-elemetns <extra-elemetns>   Specify list of additional elements that should be bundled into an image
 HEREDOC
 }
 
@@ -116,11 +124,8 @@ unset options
 
 # Parse Options ###############################################################
 
-# Initialize program option variables.
 _PRINT_HELP=0
 _USE_DEBUG=0
-
-# Initialize additional expected option variables.
 
 _require_argument() {
   local _option="${1:-}"
@@ -131,7 +136,6 @@ _require_argument() {
     _die printf "Option requires an argument: %s\\n" "${_option}"
   fi
 }
-
 
 while [ ${#} -gt 0 ]
 do
@@ -292,7 +296,6 @@ _build_image() {
       ${EXTRA_ELEMENTS} |&tee ${LOG_PATH}
   fi
 }
-
 
 ###############################################################################
 # Main
